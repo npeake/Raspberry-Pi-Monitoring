@@ -1,4 +1,4 @@
-This repository contains all python code created for use on Raspberry Pi's to read out temperature values from various connectors to monitor our pixel module test stand. 
+This repository contains all python code created for use on Raspberry Pi's to read out temperature values from various connectors to monitor the UCSC, ATLAS ITk Pixel module test stand. 
 
 The tempsendDB.py file creates a connection with an SHT85 connector through I2C of the Raspberry Pi. This sensor then monitors the cold plate the module sits on, cooled by a seperate cooling unit. The temperature value is recorded and sent to an influxDB to finally be plotted on Grafana.
 
