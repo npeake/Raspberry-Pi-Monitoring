@@ -1,0 +1,11 @@
+This file contains a list of all hardware used in the implementation and testing of the python code contained in this repository.
+
+Raspberry Pi (version independant)
+Adafruit LCD screen (Adafruit, PN: 181)
+Analog to Digital Converter (ADC, Model: MCP3008, Digikey PN: MCP3008-I/P-ND)
+Digital temp/humidity sensor (Adafruit, Model: DHT22, Digikey PN: 1528-1504-ND)
+Digital temp/humidity sensor with I2C interface (Sensirion, Model: SHT85, Digikey PN: 1649-1110-ND)
+Hall Effect sensor (Texas Instruments, Digikey PN: 296-53283-ND)
+Negative Temperature Coefficient thermistor (NTC, Amphenol Thermometrics, Digikey PN: 235-1004-ND)
+
+Any NTC can be used with this setup, simply change the beta value in the corresponding resistance to temperature conversion functions.
