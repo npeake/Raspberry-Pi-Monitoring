@@ -1,0 +1,14 @@
+[Unit]
+Description=Displays resistance and temperature read out by attached NTCs
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 -u Rdisplay.py
+WorkingDirectory=/home/pi
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=pi
+
+[Install]
+WantedBy=multi-user.target

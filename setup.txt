@@ -1,0 +1,81 @@
+The following are setup instructions for new Raspberry Pi's running the code included in this repository
+
+General Setup:
+First make sure the Pi is up to date 
+
+    sudo apt-get update
+    sudo apt-get upgrade
+    sudo apt-get install python3-dev python3-pip
+    sudo python3 -m pip install --upgrade pip setuptools wheel
+
+
+Humidity Logger Setup:
+These packages allow temperature/humidity logging to the influx db server in both tempsend.py and tempsend2.py
+
+    sudo pip3 install influxdb
+    sudo pip3 install sensirion-i2c-driver
+    sudo pip3 install sensirion-i2c-sht
+
+
+LCD Setup:
+These packages allow you to send information to an LCD screen wired to the correct GPIO pins corresponding with the code in tempsend.py
+
+    sudo pip3 install adafruit_blinka
+    sudo pip3 install RPI.GPIO
+    sudo pip3 install adafuit-circuitpython-charlcd
+    sudo pip3 install RPLCD
+
+
+ADC:
+Packages which allow for interface with MCP3008 ADC chip
+
+    sudo apt-get install build-essential python-dev python-smbus python-pip
+    sudo pip install adafruit-mcp3008
+
+
+I2C Bus Setup:
+The SHT85 sensors require communication with an I2C bus.
+    One default bus included with the raspberry pi can be activated with the code below.
+
+    sudo raspi-config
+    Open 3 Interface Options
+    Select P5 I2C
+    Select Yes to enable the interface
+
+To utilize 4 SHT sensors on a single pi, more I2c busses need to be added manually.
+    To do this, edit the following file and add the required additional lines of code.
+
+    sudo nano /boot/config.txt
+
+add the following lines of code after the section on i2c with title "# Uncomment some or all of these to enable the optional hardware interfaces" and before the infrared communication block
+
+    #adding extra i2c busses on GPIO pins
+    dtoverlay=i2c-gpio,bus=6,i2c_gpio_delay_us=1,i2c_gpio_sda=20,i2c_gpio_scl=21
+    dtoverlay=i2c-gpio,bus=5,i2c_gpio_delay_us=1,i2c_gpio_sda=12,i2c_gpio_scl=16
+    dtoverlay=i2c-gpio,bus=4,i2c_gpio_delay_us=1,i2c_gpio_sda=23,i2c_gpio_scl=24
+    dtoverlay=i2c-gpio,bus=3,i2c_gpio_delay_us=1,i2c_gpio_sda=14,i2c_gpio_scl=15
+
+These lines create I2C busses with data(sda) and clock(scl) slots on the corresponding GPIO pin number.
+In order for this to work with hardware, pull-up resistors must be added to the new data and clock pins (not required for original I2C bus, implemented on Rpi board).
+These resistors (5k Ohms) must be connected from the new I2C pins up to the 3.3V power supply, preferrably on breadboard or fixed PCB.
+Then, reboot with
+
+    sudo reboot
+
+After reboot, check that all of the busses were added with the following command.
+
+    sudo i2cdetect -l
+
+This should display busses i2c-1, i2c-3, i2c-4, i2c-5, and i2c-6 if everything was done correctly.
+To test that these new I2C pins are functional, run the following code for each new bus (3, 4, 5, 6, corresponding to bus# in the lines added to /boot/config.txt).
+
+    sudo i2cdetect -y 3
+
+This command should quickly read a grid of double dashes (--).
+    If the readout takes longer than .5 seconds, the data and clock pins for this new bus aren't pulled up correctly
+    If all spaces read numbers, then something else is likely already connected to the GPIO pins
+With the new I2C device connected to the new I2C bus, this command should show a number in one of the grids.
+    If the command still show a grid of dashes, then the device likely isn't connected correctly.
+    Check pinout and try again.
+Different pins for the new busses can be used, simply change i2c_gpio_sda and i2c_gpio_scl numbers to the desired GPIO pins
+Once the command reads devices for each new added I2C bus, the setup for this raspberry pi is complete.

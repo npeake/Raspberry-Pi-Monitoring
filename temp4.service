@@ -1,0 +1,16 @@
+[Unit]
+Description=Temperature sensing on startup (SHT85 4)
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 -u tempsendDB4.py
+WorkingDirectory=/home/pi
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=pi
+
+[Install]
+WantedBy=multi-user.target
+
+

@@ -1,0 +1,69 @@
+This file contains notes for the use of Raspberry Pi's for temp/humidity monitoring and the files contained within this directory
+
+Files:
+tempsend.py  -->  Sends temp and humidity values recorded from DHT sensors to the influx database
+                 -can run on startup from rc.local
+                 -contains all functionality for saving data to CSV locally on Pi, printing values to terminal, and outputting values to LCD
+                 -commented out by default for most basic temp sending functionality
+tempsend2.py -->  Sends temp and humidity values recorded from SHT85 sensors wire to I2C pins to the influx database
+                 -barebones version of tempsend.py adapted for SHT85 sensors
+                 -can be easily adapted to perform same functions as tempsend.py as well as log temperatures
+
+tempsendDB.py --> Sends temp and humidity values of SHT85 to influx DB using influx DB package
+                 -will run on startup using a systemd service but not with rc.local
+
+tempsendDB#.py -> Duplicate of tempsendDB.py, sends temp/humidity values of SHT sensor to influxDB 
+                  -provides a way of sensing for multiple SHTs with # being the SHT number
+                  -there are currently four of these files in the repository, for SHTs numbered 1 through 4
+                  -to use all four SHT85's at the same time one must manually add I2C busses to GPIO pins (explained in setup.txt)
+
+temp#.service --> ceates a service file to automatically start SHT sensing on startup using systemd
+                -there are currently four such files numbered 1 through 4, each corresponding to the same numbered tempsendDB#.py file
+                -must first be copied into system directory using "sudo cp /rpi-monitor/temp#.service /etc/systemd/system/temp#.service"
+                -then it can be enabled to start on the next reboot with "sudo systemctl enable temp#.service"
+
+logNTC.py    --> Sends resistance and temperature values of module NTC to influx DB
+                -also displays this temp and resistance on the LCD screen in the clean room
+                -only using channel 7 of the ADC chip, still has 7 more analog channels avalable for other NTC readout
+
+logNTCtest.py --> Code to report temp of 3 NTCs connected to the raspberry pi
+                  -Uses voltage divider network and MCP3008 ADC chip to get NTC resistance
+                  -Code then turns resistance into temp with Steinhart equation 
+                  -Temp for all three NTCs (test, hot, and cold) are uploaded to Grafana for plotting
+
+NTClogtest.service --> Service file which runs logNTCtest.py code described directly above
+                       -Set to start code on Raspberry Pi startup to reduce user input and complexity
+
+LCDtemp.py  --> Reads SHT85 sensor temp and humidity values and only prints them to an LCD screen
+                -Useful for independant control of LCD output sensor selection and refresh rate 
+                -The data pin mapping code portion will need modification unless it is followed directly for screen connection
+
+LCD.service --> Service file to launch LCDtemp.py on startup
+
+Hall_sensor.py --> Uses Hall effect sensor and ADC chip MCP3008 to sense magnetic field
+                    -Prints Hall sensor voltage to LCD screen
+                    -Includes printed message Open/Closed on LCD screen for door interlock sensing
+
+Hall.service --> Service file to run Hall_sensor.py code on startup
+                -Must be added to service files and activated with the same process as temp.service files
+                -Service file references Hall_sensor.py file in home director, must edit location to account for the Hall_sensor.py file being installed elsewhere
+
+Rdisplay.py --> Python script which uses the MCP3008 ADC chip and voltage divider to read voltage and resistance of NTCs to then calculate their temperature 
+                -The calculated resistance and temperature is then displayed on the connected LCD screen 
+
+ADCdisplay.service --> Service file to run Rdisplay.py on startup
+                        -Will likely need to update Rdisplay.py reference location based on where the repository is installed
+                        -Must add service file to systemd as with other service files 
+
+-Can set up tempsend to run on boot of the pi by adding a command to /etc/rc.local file
+    -.service files are more reliable to run scripts than rc.local, with service files included in the repo, but rc.local method is included below
+    -enter "sudo nano /etc/rc.local" into command line
+    -then add "python3 /home/pi/tempsend.py &" or tempsend file path to end of the file and save
+    -& is important to allow booting to continue while this runs in background, otherwise it won't boot fully
+    -may need a small delay added to allow other processes to fully boot before it executes
+
+-tempsendDB#.py can be run on startup using systemd (.service) functionality, won't work with rc.local
+    -this setup works using the temp#.service file corresponding to each tempsendDB#.py file to execute on startup
+    -must copy these temp#.service files from /home/pi to /etc/systemd/system/temp#.service
+    -then enable the service using sudo systemctl enable temp#.service
+    -other service files for running scripts in the background are also included, and setup in this same way
