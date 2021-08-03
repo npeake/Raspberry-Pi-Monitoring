@@ -7,6 +7,7 @@ The [setup.txt](https://github.com/npeake/Raspberry-Pi-Monitoring/blob/main/setu
 The [hardware.txt](https://github.com/npeake/Raspberry-Pi-Monitoring/blob/main/hardware.txt) file contains all hardware in the form of devices and sensors needed to properly use all the python files contained in this repository.
 
 Some of the most used python files are described below:
+
 The tempsendDB.py file creates a connection with an SHT85 connector through I2C of the Raspberry Pi. This sensor then monitors the cold plate the module sits on, cooled by a seperate cooling unit. The temperature value is recorded and sent to an influxDB to finally be plotted on Grafana.
 
 The logNTC.py file reads the temperature from the NTC attached to the module and prints this value on an LCD screen in the lab. Reading an NTC requires an analogue signal readout, so we used the MCP3000 ADC chip along with the Raspberry Pi to measure a voltage and convert it to temperature. The file contains several functions using the voltage divider created for measuring the voltage, which converts the measured voltage in the divider into a resistance value. From there, the NTC resistance is converted into a temperature value using another created function. Finally, the temperature value is sent to the influxDB and plotted on Grafana. 
