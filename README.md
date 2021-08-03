@@ -4,6 +4,8 @@ The [notes.txt](https://github.com/npeake/Raspberry-Pi-Monitoring/blob/main/note
 
 The [setup.txt](https://github.com/npeake/Raspberry-Pi-Monitoring/blob/main/setup.txt) file contains all packages necessary to install before using all of the python scripts within this repository. The installation must be done manually after the install but detailed instructions for this process are included there. 
 
+The [hardware.txt](https://github.com/npeake/Raspberry-Pi-Monitoring/blob/main/hardware.txt) file contains all hardware in the form of devices and sensors needed to properly use all the python files contained in this repository.
+
 Some of the most used python files are described below:
 The tempsendDB.py file creates a connection with an SHT85 connector through I2C of the Raspberry Pi. This sensor then monitors the cold plate the module sits on, cooled by a seperate cooling unit. The temperature value is recorded and sent to an influxDB to finally be plotted on Grafana.
 
